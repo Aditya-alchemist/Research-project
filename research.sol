@@ -21,6 +21,9 @@ contract BasicNft is ERC721 {
     Degree btech;
     Degree mtech;
     Degree Phd;
+    uint256 btechcertificateid;
+    uint256 mtechcertificateid;
+    uint256 phdcertificateid;
  }
 mapping (address=>certificateholder) public Certificateholder;
 uint256 private s_tokencounter;
@@ -59,6 +62,7 @@ function mintbtechcertificate(string memory tokenUri) public {
     require(person.btech==Degree.Btech,DO_NOT_HAVE_BTECH());
     s_tokenidtouri[s_tokencounter]=tokenUri;
     _safeMint(msg.sender,s_tokencounter);
+    person.btechcertificateid=s_tokencounter;
     s_tokencounter++;
     person.hasrecievedbtech=true;
 
@@ -69,6 +73,7 @@ certificateholder storage person= Certificateholder[msg.sender];
 require(person.mtech==Degree.Mtech,DO_NOT_HAVE_MTECH());
     s_tokenidtouri[s_tokencounter]=tokenUri;
     _safeMint(msg.sender,s_tokencounter);
+    person.mtechcertificateid=s_tokencounter;
     s_tokencounter++;
     person.hasrecievedmtech=true;
 
@@ -79,13 +84,14 @@ function mintphdcertificate(string memory tokenUri) public {
 require(person.Phd==Degree.Phd,DO_NOT_HAVE_PHD());
     s_tokenidtouri[s_tokencounter]=tokenUri;
     _safeMint(msg.sender,s_tokencounter);
+    person.phdcertificateid=s_tokencounter;
     s_tokencounter++;
     person.hasrecievedphd=true;
 
 
 }
 
-function verifyyourticket(address holder) public view  returns(string memory name,bool hasrecievedbtech,bool hasrecievedmtech,bool haserecievedphd,Degree btech,Degree mtech,Degree phd){
+function verifyyourticket(address holder) public view  returns(string memory name,bool hasrecievedbtech,bool hasrecievedmtech,bool haserecievedphd,Degree btech,Degree mtech,Degree phd,uint256 btechid,uint256 mtechid,uint256 phdid){
    certificateholder storage person = Certificateholder[holder];
    return(
    person.name,
@@ -94,7 +100,10 @@ function verifyyourticket(address holder) public view  returns(string memory nam
    person.hasrecievedphd,
    person.btech,
    person.mtech,
-   person.Phd
+   person.Phd,
+   person.btechcertificateid,
+   person.mtechcertificateid,
+   person.phdcertificateid
    );
 }
 
