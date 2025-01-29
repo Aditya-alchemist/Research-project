@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28; 
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract BasicNft is ERC721 {
+//deployed at 0x26684C0Fd95554A7516D55Dda122D0F7Ea80fD2A
+
+contract Research is ERC721 {
 
     enum Degree{none,Btech,Mtech,Phd}
 
