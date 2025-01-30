@@ -1,38 +1,229 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+/* Modern gradient background with smooth transitions */
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Centered Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+/* Glass morphism cards */
+.bg-white {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.bg-white:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Stylish inputs */
+input {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
   color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
-.App-link {
-  color: #61dafb;
+input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 500px;
+  margin: 1rem 0;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.checkbox-group input {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  cursor: pointer;
+  transform: scale(1.5);
+}
+
+/* Modern Buttons */
+button {
+  width: 100%;
+  background: linear-gradient(45deg, #FF3366, #FF6B6B);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 10px 20px rgba(255, 51, 102, 0.2);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(255, 51, 102, 0.3);
+  background: linear-gradient(45deg, #FF6B6B, #FF3366);
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Certificate Cards */
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  text-align: center;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Images */
+img {
+  max-width: 80%;
+  max-height: 300px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 auto;
+}
+
+img:hover {
+  transform: scale(1.05);
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+/* Verification Results */
+.bg-gray-50 {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+/* Error Messages */
+.bg-red-100 {
+  background: linear-gradient(45deg, #FF3366, #FF6B6B);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+/* Text Styles */
+h2 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: white;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  button {
+    width: 100%;
+  }
+  
+  img {
+    max-width: 100%;
+    max-height: 250px;
   }
 }

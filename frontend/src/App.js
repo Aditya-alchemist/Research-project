@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import axios from 'axios';
+import './App.css';
 
-const CONTRACT_ADDRESS = "0x26684C0Fd95554A7516D55Dda122D0F7Ea80fD2A";
+const CONTRACT_ADDRESS = "0xb339bDc0aC8B7Fe8ae1B987D16957b91f709F875";
 const PINATA_API_KEY = "223553f88ea60420fae4";
 const PINATA_SECRET_KEY = "36b531be959f28db2b3a9b8672fe4243dd82ccf518624ebbffd1b5b1280ec78d";
+const PINATA_GATEWAY = "https://gateway.pinata.cloud/ipfs/";
+
 const CONTRACT_ABI = [
     {
         "inputs": [],
@@ -227,17 +230,48 @@ const CONTRACT_ABI = [
 ]
 ;
 
-const createMetadata = async (certificate, cid) => {
+const CERTIFICATE_IMAGES = [
+  {
+    id: 1,
+    name: "Btech Certificate",
+    description: "Bachelor of Technology Degree Certificate",
+    imageCID: "QmbFNmuRSvn1McetnKbEk7Y5cvf2sogmUzxMXToW1PyEf4"
+  },
+  {
+    id: 2,
+    name: "Mtech Certificate",
+    description: "Master of Technology Degree Certificate",
+    imageCID: "bafybeie2mpq7yeusflqse3mics5pqrzwnhtisvlxq4fx33g6jctg4vs23q"
+  },
+  {
+    id: 3,
+    name: "Phd Certificate",
+    description: "Doctor of Philosophy Degree Certificate",
+    imageCID: "bafybeihx5adynixnqzley4twbpixgcuxnb5e4ectqilwznlyjuciunyrfq"
+  }
+];
+
+const createMetadata = async (certificate) => {
   const metadata = {
     name: certificate.name,
     description: certificate.description,
-    image: `ipfs://${cid}`,
+    image: `ipfs://${certificate.imageCID}`,
+    external_url: `${PINATA_GATEWAY}${certificate.imageCID}`,
     attributes: [
       {
-        trait_type: "Certificate",
-        value: certificate.name,
+        trait_type: "Certificate Type",
+        value: certificate.name.split(' ')[0]
       },
-    ],
+      {
+        trait_type: "Institution",
+        value: "Your Institution Name"
+      },
+      {
+        display_type: "date", 
+        trait_type: "Issue Date",
+        value: Math.floor(Date.now() / 1000)
+      }
+    ]
   };
 
   try {
@@ -253,7 +287,11 @@ const createMetadata = async (certificate, cid) => {
       }
     );
 
-    return response.data.IpfsHash;
+    return {
+      ipfsHash: response.data.IpfsHash,
+      metadataUrl: `ipfs://${response.data.IpfsHash}`,
+      httpUrl: `${PINATA_GATEWAY}${response.data.IpfsHash}`
+    };
   } catch (err) {
     console.error("Error uploading to Pinata:", err);
     throw new Error("Failed to upload metadata to Pinata");
@@ -270,6 +308,8 @@ const App = () => {
   const [hasphd, setHasPhd] = useState(false);
   const [verifyingaddress, setVerifyingAddress] = useState('');
   const [verificationDetails, setVerificationDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [metadataInfo, setMetadataInfo] = useState(null);
 
   const connectButton = async () => {
     if (window.ethereum) {
@@ -308,29 +348,94 @@ const App = () => {
     }
   };
 
-  const mintCertificate = async (certificateType, cid) => {
+  // Separate functions for minting each type of certificate
+  const mintBtechCertificate = async () => {
     if (!window.ethereum) {
       setError("Please connect your wallet");
       alert("Please connect your wallet");
       return;
     }
+    setLoading(true);
+    setError("");
     try {
-      const certificate = {
-        name: `${certificateType} Certificate`,
-        description: `This is a certificate for ${certificateType}`,
-      };
-      const createMetadataHash = await createMetadata(certificate, cid);
-      const metadataUrl = `ipfs://${createMetadataHash}`;
+      const certificate = CERTIFICATE_IMAGES[0]; // Btech certificate
+      const metadata = await createMetadata(certificate);
+      setMetadataInfo(metadata);
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      const tx = await contract[`mint${certificateType.toLowerCase()}certificate`](metadataUrl);
+      
+      const tx = await contract.mintbtechcertificate(metadata.metadataUrl);
       await tx.wait();
-      alert(`${certificateType} certificate minted successfully`);
+      
+      alert("BTech certificate minted successfully");
       setError('');
     } catch (error) {
       setError(error.message);
-      alert(`Only person with ${certificateType} qualification can mint certificate`);
+      alert("Only person with BTech qualification can mint this certificate");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mintMtechCertificate = async () => {
+    if (!window.ethereum) {
+      setError("Please connect your wallet");
+      alert("Please connect your wallet");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const certificate = CERTIFICATE_IMAGES[1]; // Mtech certificate
+      const metadata = await createMetadata(certificate);
+      setMetadataInfo(metadata);
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      
+      const tx = await contract.mintmtechcertificate(metadata.metadataUrl);
+      await tx.wait();
+      
+      alert("MTech certificate minted successfully");
+      setError('');
+    } catch (error) {
+      setError(error.message);
+      alert("Only person with MTech qualification can mint this certificate");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mintPhdCertificate = async () => {
+    if (!window.ethereum) {
+      setError("Please connect your wallet");
+      alert("Please connect your wallet");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const certificate = CERTIFICATE_IMAGES[2]; // PhD certificate
+      const metadata = await createMetadata(certificate);
+      setMetadataInfo(metadata);
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      
+      const tx = await contract.mintphdcertificate(metadata.metadataUrl);
+      await tx.wait();
+      
+      alert("PhD certificate minted successfully");
+      setError('');
+    } catch (error) {
+      setError(error.message);
+      alert("Only person with PhD qualification can mint this certificate");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -368,6 +473,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto space-y-8">
+        {/* Wallet Connection Section */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">Wallet Connection</h2>
           <button 
@@ -378,6 +484,7 @@ const App = () => {
           </button>
         </div>
 
+        {/* Add Person Details Section */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">Add Person Details</h2>
           <div className="space-y-4">
@@ -433,39 +540,64 @@ const App = () => {
           </div>
         </div>
 
+        {/* Mint Certificates Section */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">Mint Certificates</h2>
           <div className="space-y-6">
-            <div>
-              <h3 className="font-semibold mb-2">BTech Certificate</h3>
+            {/* BTech Certificate */}
+            <div className="border-b pb-6">
+              <h3 className="text-xl font-semibold mb-4">{CERTIFICATE_IMAGES[0].name}</h3>
+              <img 
+                src={`${PINATA_GATEWAY}${CERTIFICATE_IMAGES[0].imageCID}`}
+                alt={CERTIFICATE_IMAGES[0].name}
+                className="w-64 h-auto mb-4 rounded"
+              />
               <button
-                onClick={() => mintCertificate('Btech', 'QmbFNmuRSvn1McetnKbEk7Y5cvf2sogmUzxMXToW1PyEf4')}
-                className="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                onClick={mintBtechCertificate}
+                disabled={loading}
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
               >
-                Mint BTech Certificate
+                {loading ? "Processing..." : "Mint BTech Certificate"}
               </button>
             </div>
-            <div>
-              <h3 className="font-semibold mb-2">MTech Certificate</h3>
+
+            {/* MTech Certificate */}
+            <div className="border-b pb-6">
+              <h3 className="text-xl font-semibold mb-4">{CERTIFICATE_IMAGES[1].name}</h3>
+              <img 
+                src={`${PINATA_GATEWAY}${CERTIFICATE_IMAGES[1].imageCID}`}
+                alt={CERTIFICATE_IMAGES[1].name}
+                className="w-64 h-auto mb-4 rounded"
+              />
               <button
-                onClick={() => mintCertificate('Mtech', 'bafybeie2mpq7yeusflqse3mics5pqrzwnhtisvlxq4fx33g6jctg4vs23q')}
-                className="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                onClick={mintMtechCertificate}
+                disabled={loading}
+                className="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 disabled:bg-gray-400"
               >
-                Mint MTech Certificate
+                {loading ? "Processing..." : "Mint MTech Certificate"}
               </button>
             </div>
-            <div>
-              <h3 className="font-semibold mb-2">PhD Certificate</h3>
+
+            {/* PhD Certificate */}
+            <div className="pb-6">
+              <h3 className="text-xl font-semibold mb-4">{CERTIFICATE_IMAGES[2].name}</h3>
+              <img 
+                src={`${PINATA_GATEWAY}${CERTIFICATE_IMAGES[2].imageCID}`}
+                alt={CERTIFICATE_IMAGES[2].name}
+                className="w-64 h-auto mb-4 rounded"
+              />
               <button
-                onClick={() => mintCertificate('Phd', 'bafybeihx5adynixnqzley4twbpixgcuxnb5e4ectqilwznlyjuciunyrfq')}
-                className="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                onClick={mintPhdCertificate}
+                disabled={loading}
+                className="w-full bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 disabled:bg-gray-400"
               >
-                Mint PhD Certificate
+                {loading ? "Processing..." : "Mint PhD Certificate"}
               </button>
             </div>
           </div>
         </div>
 
+        {/* Verify Certificate Section */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">Verify Certificate</h2>
           <div className="space-y-4">
@@ -479,33 +611,81 @@ const App = () => {
             <button
               onClick={verifyYourTicket}
               className="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-            >
-              Verify Certificate
-            </button>
-
+              >
+                Verify Certificate
+              </button>
+            </div>
+  
+            {/* Verification Results Display */}
             {verificationDetails && (
-              <div className="mt-4 p-4 bg-gray-50 rounded">
-                <h3 className="font-semibold mb-2">Verification Results:</h3>
-                <p><strong>Name:</strong> {verificationDetails.name}</p>
-                <p><strong>Qualifications:</strong></p>
-                <ul className="list-disc pl-5">
-                  {verificationDetails.hasBtech && <li>BTech (ID: {verificationDetails.btechId})</li>}
-                  {verificationDetails.hasMtech && <li>MTech (ID: {verificationDetails.mtechId})</li>}
-                  {verificationDetails.hasPhd && <li>PhD (ID: {verificationDetails.phdId})</li>}
-                </ul>
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-xl font-semibold mb-3">Verification Results</h3>
+                <div className="space-y-2">
+                  <p><span className="font-semibold">Name:</span> {verificationDetails.name}</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    {/* BTech Details */}
+                    <div className="p-3 bg-white rounded shadow-sm">
+                      <h4 className="font-semibold">BTech</h4>
+                      <p>Status: {verificationDetails.hasBtech ? "Verified" : "Not Verified"}</p>
+                      {verificationDetails.hasBtech && (
+                        <p>Certificate ID: {verificationDetails.btechId}</p>
+                      )}
+                    </div>
+                    
+                    {/* MTech Details */}
+                    <div className="p-3 bg-white rounded shadow-sm">
+                      <h4 className="font-semibold">MTech</h4>
+                      <p>Status: {verificationDetails.hasMtech ? "Verified" : "Not Verified"}</p>
+                      {verificationDetails.hasMtech && (
+                        <p>Certificate ID: {verificationDetails.mtechId}</p>
+                      )}
+                    </div>
+                    
+                    {/* PhD Details */}
+                    <div className="p-3 bg-white rounded shadow-sm">
+                      <h4 className="font-semibold">PhD</h4>
+                      <p>Status: {verificationDetails.hasPhd ? "Verified" : "Not Verified"}</p>
+                      {verificationDetails.hasPhd && (
+                        <p>Certificate ID: {verificationDetails.phdId}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
+  
+          {/* Error Display */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+  
+          {/* Metadata Info Display */}
+          {metadataInfo && (
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-2xl font-bold mb-4">Metadata Information</h2>
+              <div className="space-y-2">
+                <p><span className="font-semibold">IPFS Hash:</span> {metadataInfo.ipfsHash}</p>
+                <p><span className="font-semibold">Metadata URL:</span> {metadataInfo.metadataUrl}</p>
+                <p>
+                  <span className="font-semibold">HTTP URL:</span>
+                  <a 
+                    href={metadataInfo.httpUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-700 ml-2"
+                  >
+                    View on IPFS
+                  </a>
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
-        )}
       </div>
-    </div>
-  );
-};
-
-export default App;
+    );
+  };
+  
+  export default App;
