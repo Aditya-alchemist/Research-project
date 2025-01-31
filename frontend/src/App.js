@@ -235,19 +235,19 @@ const CERTIFICATE_IMAGES = [
     id: 1,
     name: "Btech Certificate",
     description: "Bachelor of Technology Degree Certificate",
-    imageCID: "QmbFNmuRSvn1McetnKbEk7Y5cvf2sogmUzxMXToW1PyEf4"
+    imageCID: "bafkreignwirp27fiqlrearvqsrwkw3pfio23xphetzev3oncg5i4bb5fee"
   },
   {
     id: 2,
     name: "Mtech Certificate",
     description: "Master of Technology Degree Certificate",
-    imageCID: "bafybeie2mpq7yeusflqse3mics5pqrzwnhtisvlxq4fx33g6jctg4vs23q"
+    imageCID: "bafybeid7hffg3doj2zz7rvqwa6r27ko5tdz4pde7yrldct54psdfgyugji"
   },
   {
     id: 3,
     name: "Phd Certificate",
     description: "Doctor of Philosophy Degree Certificate",
-    imageCID: "bafybeihx5adynixnqzley4twbpixgcuxnb5e4ectqilwznlyjuciunyrfq"
+    imageCID: "bafybeigr7bsxko7u5mhw4zj5kueauhcp5t3uou3tvyb6w7c7m7j65hygh4"
   }
 ];
 
